@@ -1,5 +1,5 @@
 ---
-title: Skeleton Report 1
+title: Scenario 1
 date: "Date: `r Sys.Date()`"
 output:
   # radix::radix_article: # radix is a newer alternative that has some advantages over `html_document`.
@@ -10,8 +10,7 @@ output:
     number_sections: true
 ---
 
-This report covers the analyses used in the ZZZ project (Marcus Mark, PI).
-
+This report creates basic bar graphs and box plots.
 <!--  Set the working directory to the repository's base directory; this assumes the report is nested inside of two directories.-->
 ```{r, echo=F, message=F} 
 # cat("Working directory: ", getwd())
@@ -34,10 +33,10 @@ opts_chunk$set(
   fig.path     = 'figure-png/'
 )
 
-echo_chunks    <- FALSE #Toggle for debugging.
+echo_chunks    <- TRUE #Toggle for debugging.
 message_chunks <- FALSE #Toggle for debugging.
 options(width=100) #So the output is 25% wider than the default.
-read_chunk("./analysis/report-1/report-1.R") #This allows knitr to call chunks tagged in the underlying *.R file.
+read_chunk("./analysis/scenario-1/scenario-1.R") #This allows knitr to call chunks tagged in the underlying *.R file.
 ```
 
 <!-- Load 'sourced' R files.  Suppress the output when loading sources. --> 
@@ -51,6 +50,7 @@ read_chunk("./analysis/report-1/report-1.R") #This allows knitr to call chunks t
 <!-- Load any global functions and variables declared in the R file.  Suppress the output. --> 
 ```{r declare-globals, echo=echo_chunks, results='show', message=message_chunks}
 ```
+
 
 <!-- Declare any global functions specific to a Rmd output.  Suppress the output. --> 
 ```{r rmd-specific, echo=echo_chunks, message=message_chunks}
@@ -73,38 +73,43 @@ Summary {.tabset .tabset-fade .tabset-pills}
 Notes 
 ---------------------------------------------------------------------------
 
-1. The current report covers `r nrow(ds)` cars, with `r dplyr::n_distinct(ds$carburetor_count_f)` unique values for `carburetor_count`.
-1. The Seattle track's phluguerstometer was producing flaky negative values; it's measurements have been dropped.
 
-
-Unanswered Questions
----------------------------------------------------------------------------
-
-1. What does `VS` stand for?  How was it measured?
-1. Where the cars at the Philly track measured with the same phluguerstometer and the Cleveland track?
- 
- 
-Answered Questions
----------------------------------------------------------------------------
-
-1. The Seattle track's phluguerstometer was producing flaky negative values; it's measurements have been dropped.
 
 
 Graphs
 ===========================================================================
 
 
+Bar graphs
+---------------------------------------------------------------------------
+
+```{r bargraphs, echo=echo_chunks, message=message_chunks, fig.width=7}
+```
+
+Box plots
+---------------------------------------------------------------------------
+
+```{r boxplots, echo=echo_chunks, message=message_chunks, fig.width=7}
+```
+
+How to print graphs
+---------------------------------------------------------------------------
+
+```{r print-graphs, echo=TRUE, message=message_chunks, fig.width=7}
+```
+
+
+Custom graphs
+===========================================================================
+Frequently we need to specify custom functions for graphing, indigenous to the current report
+
+```{r define-graphing-functions, echo=echo_chunks, results='show', message=message_chunks}
+```
+
 Marginals
 ---------------------------------------------------------------------------
 
 ```{r marginals, echo=echo_chunks, message=message_chunks}
-```
-
-
-Scatterplots
----------------------------------------------------------------------------
-
-```{r scatterplots, echo=echo_chunks, message=message_chunks, fig.width=7}
 ```
 
 
@@ -123,7 +128,6 @@ Final Model
 ```{r model-results-table, echo=echo_chunks, message=message_chunks, warning=TRUE}
 ```
 
-In the model that includes two predictors, the slope coefficent of `Miles per gallon` is `r summary(m2)$coefficients[2,1]`.
 
 
 Session Information

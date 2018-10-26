@@ -33,10 +33,13 @@ library(dplyr)
 
 # ---- declare-globals ---------------------------------------------------------
 options(show.signif.stars=F) #Turn off the annotations on p-values
-
+# create a string object that store the path to the data file
 path_input <- "./data-public/raw/scenario-1/cash.txt"
 
 # ---- load-data ---------------------------------------------------------------
+# an alterntative way to store small datasets in R
+# useful to share reproducible examples on online forums
+# use fundtion dput() to print an object in this way
 # ds <- structure(list(X1 = c(21, 23, 19, 22, 22, 23, 21, 22, 20, 21, 
 #                       19, 25, 30, 29, 26, 28, 27, 27, 26, 29, 27, 28, 27, 29, 25, 22, 
 #                       23, 21, 22, 21, 23, 19, 20, 21, 20, 20),

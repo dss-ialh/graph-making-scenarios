@@ -153,7 +153,9 @@ g4
 
 # ---- a3 ---------------------------------------
 # let us use g3 as the graph to enchance
-g3
+g3 <- d_group_means %>% 
+  ggplot( aes(x= age_group , y = cash_mean, fill = sex ) ) +
+  geom_bar( stat = "identity", position = position_dodge())
 
 # add titles for both axes and the graph itself
 g3 <- g3 + labs(
@@ -161,10 +163,14 @@ g3 <- g3 + labs(
   , y     = "Cash mean"
   , title = "Cash mean by group"
 )
+# g3
+
+# add mean values on top of each bar
+g3 <- g3 +
+  geom_text(
+    aes(label = round(cash_mean, 2) )
+    , position = position_dodge(width = 1))
 g3
-
-
-# 
 
 
 

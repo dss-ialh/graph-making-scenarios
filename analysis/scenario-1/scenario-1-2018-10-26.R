@@ -151,6 +151,23 @@ g4 <- ds %>%
 g4
 
 
+# ---- a3 ---------------------------------------
+# let us use g3 as the graph to enchance
+g3
+
+# add titles for both axes and the graph itself
+g3 <- g3 + labs(
+  x       = "Age Group"
+  , y     = "Cash mean"
+  , title = "Cash mean by group"
+)
+g3
+
+
+# 
+
+
+
 # ----- print-graphs ---------------------
 
 # create a function that prints an alluvia plot with the label on top as a separate plot

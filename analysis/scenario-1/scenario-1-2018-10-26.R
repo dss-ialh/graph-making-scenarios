@@ -112,7 +112,7 @@ g1 <- g1 + ggplot2::theme(
 g1
 # there are multiple bars becasue we plot each observation as a bar
 # instead we should plot each observation as a point,
-# and plot group means as a bars in a separate graph
+# and plot group means as  bars in a separate graph
 
 # if we insist on displaying both individual data points AND group means
 # in the same graph, I would recommend resorting to boxplots
@@ -124,42 +124,32 @@ g2 <- ds %>%
 g2
 
 # ---- a2 --------------------------------------
+# in order to plot group means, we can resort to either two strategies
+# we can either 1) compute the values of the mean in a separate ds
+# or we can compute the means inside the ggplot itself
 
-ds %>% 
+# Strategy 1) - separate data set
+d_group_means <- ds %>% 
   dplyr::group_by(age_group, sex) %>% 
   dplyr::summarize(
     n = n()
-    ,mean = mean(cash,na.rm=T)
+    ,cash_mean = mean(cash, na.rm=T)
   )
+d_group_means
+# now plot the graph from the created data set
+g3 <- d_group_means %>% 
+  ggplot( aes(x= age_group , y = cash_mean, fill = sex ) ) +
+  geom_bar( stat = "identity", position = position_dodge())
+g3
 
-g1 <- ds %>% 
-  dplyr::group_by(age_group, sex) %>% 
-  dplyr::summarize(
-    n = n()
-    ,cash_mean = mean(cash,na.rm=T)
-  ) %>% 
-  ggplot(aes(x = age_group, y = cash_mean)) +
-  geom_bar(
-    aes(fill = sex)
-    ,stat = "identity"
-    ,position = position_dodge()
-  )+
-  main_theme
-g1
+# Strategy 2) - inside ggplot
+# notice that we use the orignal data set with raw y values
+ds %>% head()
+g4 <- ds %>% 
+  ggplot( aes(x= age_group , y = cash, fill = sex ) ) +
+  geom_bar(position = "dodge", stat = "summary", fun.y = "mean")
+g4
 
-
-
-
-
-# ---- boxplots ----------------------
-
-
-g2a <- ds %>% 
-  ggplot2::ggplot(aes(x=age_group, y = cash, fill= sex))+
-  geom_violin(alpha = .5, show.legend = T)+
-  geom_jitter(height = 0, width = .2, shape = 21, size = 2, alpha = .5)+
-  main_theme
-g2a
 
 # ----- print-graphs ---------------------
 

@@ -17,7 +17,5 @@ The sessions will be telecast live via [BlueJeans App][bluejeans], with phone di
 
 
 
-[notes_talks]:https://docs.google.com/document/d/15SYHa7mftXQk8qyGJ9aT26kQOjbCqtzrg6IS68Foflc/edit?usp=sharing
-
-
+[notes_talks]:https://docs.google.com/document/d/1ARRecAQWkWZ80dedC5Qcv7_fHOAny_sE1fHipssauJU/edit?usp=sharing
 [bluejeans]:https://bluejeans.com/176927559?src=textEmail

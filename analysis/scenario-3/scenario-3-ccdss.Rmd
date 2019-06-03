@@ -111,21 +111,32 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 ```{r phase-1-graph-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
 ```
 
-## graph-2 facet
+## graph-2 wrap
 ```{r phase-1-graph-2, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7, out.width="960px", warning = FALSE}
 ```
 
-```{r phase-1-graph-3, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=17, out.width="960px", warning = FALSE}
+## graph-2 grid
+
+```{r phase-1-graph-3, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7, out.width="960px", warning = FALSE}
+```
+
+```{r phase-1-graph-4, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=16, out.width="960px", warning = FALSE}
 ```
 
 # PHASE 2 - make plot
 
-```{r phase-2-make_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```{r phase-2-make_plot, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7,out.width="960px"}
+```
+
+```{r phase-2-make_plot-1, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=17,out.width="960px"}
+```
+
+```{r phase-2-make_plot-2, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7,out.width="960px"}
 ```
 
 # PHASE 3 - prep data
 
-```{r phase-3-prep_data, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```{r  phase-3-prep_data-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
 ```
 
 # PHASE 4 - print plot

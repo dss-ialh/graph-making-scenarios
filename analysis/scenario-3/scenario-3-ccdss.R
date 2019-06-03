@@ -162,7 +162,9 @@ g1a <- ds1 %>%
 g1a
 
 # ---- phase-1-graph-2 --------------------------
-# to introduce external dimensions
+# let us introduce external dimensions
+# we will keep one of the external dimension constant and facet_wrap on the other
+
 g2a <- ds1 %>% 
   # dplyr::filter(area       ==  "British Columbia" ) %>% 
   dplyr::filter(age_group  ==  "20-34" ) %>%
@@ -196,9 +198,11 @@ g2b <- ds1 %>%
   labs( title = "Crude prevalence of MH service utilization in British Columbia")
 g2b
 
+# ---- phase-1-graph-3 --------------------------
+# now let facet_grid on both demension
 g2c <- ds1 %>% 
   dplyr::mutate(
-    years_since_2000 = year - 2000
+    years_since_2000 = year - 2000 # for shorter axis labels
   ) %>% 
   # dplyr::filter(area       ==  "British Columbia" ) %>%
   # dplyr::filter(age_group  ==  "20-34" ) %>%
@@ -210,16 +214,16 @@ g2c <- ds1 %>%
   ))+
   geom_point()+
   geom_line( aes(group = sex) )+
-  # facet_grid(area ~ age_group)+ # new
   facet_grid(age_group ~ area)+ # new
+  # facet_grid(area ~ age_group)+ # new
   theme_minimal()+
   labs( title = "Crude prevalence of MH service utilization in Canada")
 g2c
 
-# ---- phase-1-graph-3 --------------------------
+# ---- phase-1-graph-4 --------------------------
 g2d <- ds1 %>% 
   dplyr::mutate(
-    years_since_2000 = year - 2000
+    years_since_2000 = year - 2000 # for shorter axis labels
   ) %>% 
   # dplyr::filter(area       ==  "British Columbia" ) %>%
   # dplyr::filter(age_group  ==  "20-34" ) %>%
@@ -231,14 +235,14 @@ g2d <- ds1 %>%
   ))+
   geom_point()+
   geom_line( aes(group = sex) )+
-  facet_grid(area ~ age_group)+ # new
   # facet_grid(age_group ~ area)+ # new
+  facet_grid(area ~ age_group)+ # new
   theme_minimal()+
   labs( title = "Crude prevalence of MH service utilization in Canada")
 g2d
 
 # ---- phase-2-make_plot --------------------------
-# suppose, we have settled on the graphical form `g2d`
+# suppose, we have settled on the graphical form `g2d` (immediately above)
 g2d <- ds1 %>% 
   dplyr::mutate(
     years_since_2000 = year - 2000
@@ -255,19 +259,21 @@ g2d <- ds1 %>%
   theme_minimal()+
   labs( title = "Crude prevalence of MH service utilization in Canada")
 
+# ---- phase-2-make_plot-1 --------------------------
 # now let us re-express this plot as a custom function
 make_plot_1 <- function(
   d
+  ,measure = "rate"
 ){
   d1 <- d %>% 
     dplyr::mutate(
-      years_since_2000 = year - 2000
+      years_since_2000 = year - 2000 # to create a shorter axis label
     )
   
   g_out <- d1 %>% 
     ggplot(aes_string(
-       x      = "year"
-       ,y     = "rate"
+       x      = "years_since_2000"
+       ,y     = measure
        ,color = "sex"
     ))+
     geom_point()+
@@ -281,8 +287,9 @@ make_plot_1 <- function(
 ds1 %>% 
   dplyr::filter(sex       %in% c("Males","Females") ) %>% 
   # notice that we keep operations on the data outside of the function definition
-  make_plot_1()
+  make_plot_1(measure = "rate")
 
+# ---- phase-2-make_plot-2 --------------------------
 # We need our function to offer us a convinient way to:
 # 1. Control the order of the columns
 # 2. Control the order of the rows
@@ -291,7 +298,9 @@ ds1 %>%
 # if we were to pack everything into a single function we would get something like:
 make_plot_1_packed <- function(
   d
+  ,measure
 ){
+  d1 <- d
   # create support objects
   order_of_age_groups <- d1 %>% 
     dplyr::arrange() %>% 
@@ -306,27 +315,27 @@ make_plot_1_packed <- function(
     as.list() %>% unlist() %>% as.character()
   # make total value to be at the beginning of the vector
   order_of_areas <- c("Canada", setdiff(order_of_areas, "Canada")  )
+  # to customize the order of levels
+  levels_sex <- c("Females", "Males","Both sexes")
   # 
   d1 <- d %>% 
     dplyr::mutate(
-      # to create a shorter label
-      years_since_2000 = year - 2000
+      years_since_2000 = year - 2000 # to create a shorter label
       # to enforce the chosen order of the levels:
-      ,area = factor(area, levels = order_of_areas)
-      ,age_group = factor(age_group, levels = order_of_age_groups)
+      ,area            = factor(area,      levels = order_of_areas)
+      ,age_group       = factor(age_group, levels = order_of_age_groups)
+      ,levels_sex      = factor(sex,       levels = levels_sex)
     )
-  # to customize the color 
-  palette_sex_dark         <- c("#af6ca8", "#5a8fc1") #duller than below. http://colrd.com/image-dna/42282/ & http://colrd.com/image-dna/42275/
-  palette_sex_dark         <- c("#f25091", "#6718f4") #brighter than above. http://colrd.com/palette/42278/
-  pallete_sex_light        <- adjustcolor(palette_sex_dark, alpha.f = .2)
-  names(palette_sex_dark)  <- c("Females", "Males")
-  names(pallete_sex_light) <- names(pallete_sex_light)
-  palette_sex <- c(
-    "Females"       = "#d95f02" # pink
-    ,"Males"        = "#7570b3" # blue
-    ,"Both sexes"   = "#1b9e77" # green
-    )
+  # to create custom pallets:
+  
+  # descriptive tag              # green     # red      # blue
+  palette_sex_dark         <- c("#1b9e77", "#d95f02", "#7570b3") #duller than below
+  # palette_sex_dark         <- c("#66c2a5", "#fc8d62", "#8da0cb") #brighter than above
   # taken from http://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
+  pallete_sex_light        <- adjustcolor(palette_sex_dark, alpha.f = .2)
+  names(palette_sex_dark)  <- c("Both sexes", "Females", "Males")
+  names(pallete_sex_light) <- names(pallete_sex_light)
+  
   g_out <- d1 %>% 
     ggplot(aes_string(
       x      = "year"
@@ -345,30 +354,124 @@ make_plot_1_packed <- function(
 # how to use
 ds1 %>% 
   # to limit the view while in development
-  # dplyr::filter(age_group %in% c("1-19", "20-34", "80+","1+")) %>% 
-  # dplyr::filter(area %in% c("Canada", "Alberta", "British Columbia")) %>% 
+  dplyr::filter(age_group %in% c("1-19", "20-34", "80+","1+")) %>%
+  dplyr::filter(area %in% c("Canada", "Alberta", "British Columbia")) %>%
   dplyr::filter(sex %in% c("Males","Females")) %>%
-  make_plot_1_packed()
+  make_plot_1_packed(measure = "rate")
 
-# ---- prep_data_plot_1 ------------------------------
+# as you notice, the function got bulkier due to operations needed
+# to construct a reference vector for factor levels 
+# these and other operations are typically best sourced out 
+# to the `prep_data` function
 
+# ---- phase-3-prep_data-1 ------------------------------
+
+# let us construct a new `prep_data` function that would
+# isolate the preparatory operations from the `make_plot` function
 prep_data_plot_1 <- function(
   d_input
-  # ,set_area      = c("Canada")
-  # ,set_age_group = c("20-34")
-  # ,set_sex       = c("Males","Females")
+  ,set_area      = c("Canada")
+  ,set_age_group = c("20-34")
+  ,set_sex       = c("Males","Females")
 ){
-  d_input <- ds1 %>% 
-    # dplyr::filter(area      %in% c(set_area)     ) %>% 
-    # dplyr::filter(age_group %in% c(set_age_group))%>% 
-    # dplyr::filter(sex       %in% c(set_sex)  )  
-    
-  d1 <- d_input
+  d1 <- d_input  # for within-function use
+  # d1 <- ds1  # for testing and development
   
+  # create support objects
+  order_of_age_groups <- d1 %>% 
+    dplyr::arrange() %>% 
+    dplyr::distinct(age_group) %>% 
+    as.list() %>% unlist() %>% as.character()
+  # to position the total value at the END of the vector
+  order_of_age_groups <- c(setdiff(order_of_age_groups,"1+"),"1+")
+  
+  order_of_areas <- d1 %>% 
+    dplyr::distinct(area) %>% 
+    dplyr::arrange(area) %>% 
+    as.list() %>% unlist() %>% as.character()
+  # to position the total value at the BEGINNING of the vector
+  order_of_areas <- c("Canada", setdiff(order_of_areas, "Canada")  )
+
+  # to customize the order of levels
+  levels_sex <- c("Females", "Males","Both sexes")
+  
+  d2 <- d1 %>% 
+    dplyr::filter(area      %in% c(set_area)     ) %>%
+    dplyr::filter(age_group %in% c(set_age_group))%>%
+    dplyr::filter(sex       %in% c(set_sex)  ) %>% 
+    dplyr::mutate(
+      # to create a shorter label
+      years_since_2000 = year - 2000
+      # to enforce the chosen order of the levels:
+      ,area      = factor(area,      levels = order_of_areas)
+      ,age_group = factor(age_group, levels = order_of_age_groups)
+      ,sex       = factor(sex,       levels = levels_sex )
+    )
+  # to store objects for passing to the `make_plot` function
+  l_support <- list()
+  l_support[["data"]] <- d2
+  l_support[["levels"]][["sex"]]    <- levels_sex
+  l_support[["set"]][["sex"]]       <- set_sex
+  l_support[["set"]][["area"]]      <- set_area
+  l_support[["set"]][["age_group"]] <- set_age_group
+  lapply(l_support, class)
+
   return(l_support)
 }
 # how to use
+l_support <- ds1 %>% 
+  prep_data_plot_1(
+     set_sex       = c("Females", "Males") 
+    ,set_area      = c("Canada", "Alberta", "British Columbia") 
+    ,set_age_group = c("1-19", "20-34", "80+","1+")
+  )
+l_support %>% print()
 
+# now we can pass this curated object `l_support` to graphing function
+# note that we need to adjust the function to accomodate a new input object
+make_plot_1 <- function(
+  l_support
+  ,measure 
+){
+  d <- l_support$data
+  # to customize the color 
+  palette_sex <- c(
+    "Females"       = "#d95f02" # pink
+    ,"Males"        = "#7570b3" # blue
+    ,"Both sexes"   = "#1b9e77" # green
+  )
+  # taken from http://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
+  # descriptive tag              # green     # red      # blue
+  palette_sex_dark         <- c("#1b9e77", "#d95f02", "#7570b3") #duller than below
+  # palette_sex_dark         <- c("#66c2a5", "#fc8d62", "#8da0cb") #brighter than above
+  pallete_sex_light        <- adjustcolor(palette_sex_dark, alpha.f = .2)
+  names(palette_sex_dark)  <- c("Both sexes", "Females", "Males")
+  names(pallete_sex_light) <- names(pallete_sex_light)
+  
+  g_out <- d %>% 
+    ggplot(aes_string(
+      x      = "years_since_2000"
+      ,y     = measure
+      ,color = "sex"
+    ))+
+    geom_point()+
+    geom_line( aes_string(group = "sex") )+
+    facet_grid(area ~ age_group)+
+    scale_color_manual(values = palette_sex_dark)+
+    # scale_color_manual(values = pallete_sex_light)+
+    theme_minimal()+
+    labs( title = "Crude prevalence of MH service utilization in BC among 20-34 year olds")
+  return(g_out)  
+}
+# how to use
+g1 <- ds1 %>% 
+  prep_data_plot_1(
+    set_sex        = c("Females", "Males", "Both sexes") 
+    ,set_area      = c("Canada", "Alberta", "British Columbia") 
+    ,set_age_group = c("1-19", "20-34", "80+","1+")
+  ) %>% 
+  make_plot_1(measure = "rate") # rate (rate_cv), number, population
+g1
 
 # ---- print_plot_1 ---------------------------------
 

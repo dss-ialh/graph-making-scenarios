@@ -55,7 +55,7 @@ message_chunks <- FALSE #Toggle for debugging.
 options(width=100) #So the output is 25% wider than the default.
 read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to call chunks tagged in the underlying *.R file.
 ```
-# Set the scene
+# set the scene
 
 ## load packages
 <!-- Load packages, or at least verify they're available on the local machine.  Suppress the output when loading packages. --> 
@@ -81,7 +81,7 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 ```{r load-data, echo=echo_chunks, results='show', message=message_chunks}
 ```
 
-# PHASE 0 
+# PHASE 0 - explore 
 
 ## tweak data
 <!-- Tweak the datasets.   -->
@@ -101,26 +101,49 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 ```{r inspect-data-3, echo=echo_chunks, results='asis', message=message_chunks}
 ```
 
-# PHASE 1
+# PHASE 1 - graph
 
 ## sketch the space
-```{r sketch-the-space, echo=echo_chunks, results='show', message=message_chunks}
+```{r phase-1-graph, echo=echo_chunks, results='show', message=message_chunks}
 ```
 
 ## graph-1 basic
-```{r graph-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```{r phase-1-graph-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
 ```
 
 ## graph-2 facet
-```{r graph-2, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7, out.width="960px", warning = FALSE}
+```{r phase-1-graph-2, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7, out.width="960px", warning = FALSE}
 ```
 
-# PHASE 2
-
-```{r define-plot-function, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```{r phase-1-graph-3, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=17, out.width="960px", warning = FALSE}
 ```
 
+# PHASE 2 - make plot
 
+```{r phase-2-make_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```
+
+# PHASE 3 - prep data
+
+```{r phase-3-prep_data, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```
+
+# PHASE 4 - print plot
+
+```{r phase-4-print_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```
+
+# PHASE 5 - serialize
+
+```{r phase-5-serialize, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```
+
+# PHASE 6 - place plot
+
+```{r phase-6-place_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```
+
+# concluding remarks
 
 
 # future direction

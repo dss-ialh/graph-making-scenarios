@@ -102,7 +102,7 @@ ds1 %>%
   explore::describe() %>% neat()
 
 
-# ---- sketch-the-space -----------------------
+# ---- phase-1-graph -----------------------
 # now let us find ways to look at/in/with data
 # the above analysis helps us to conceptualize available variables as:
 
@@ -119,14 +119,14 @@ ds1 %>%
 
 #  II - VISUALIZATION space 
 
-## INTERNAL - horizontal - 
-## INTERNAL - vertical   - 
-## INTERNAL - color      - 
-## EXTERNAL - horizontal -
-## EXTERNAL - vertial    -
+## INTERNAL - horizontal - TIME    - (year) 
+## INTERNAL - vertical   - MEASURE - (rate)  
+## INTERNAL - color      - DESIGN  - (sex)
+## EXTERNAL - horizontal - DESIGN  - (area)
+## EXTERNAL - vertial    - DESIGN  - (age_group)
 
 
-# ---- graph-1 --------------------------
+# ---- phase-1-graph-1 --------------------------
 # let us sketch the most basic graph in 3 internal dimensions
 # notice that we isolate a single value on all the rest dimensions
 g1 <- ds1 %>% 
@@ -161,7 +161,7 @@ g1a <- ds1 %>%
   labs( title = "Crude prevalence of MH service utilization in BC among 20-34 year olds")
 g1a
 
-# ---- graph-2 --------------------------
+# ---- phase-1-graph-2 --------------------------
 # to introduce external dimensions
 g2a <- ds1 %>% 
   # dplyr::filter(area       ==  "British Columbia" ) %>% 
@@ -216,31 +216,55 @@ g2c <- ds1 %>%
   labs( title = "Crude prevalence of MH service utilization in Canada")
 g2c
 
-# ---- define-plot-function --------------------------
-# suppose, we have settled on the graphical form `g1`
-g1 <- ds1 %>% 
-  dplyr::filter(area       ==  "British Columbia" ) %>% 
-  dplyr::filter(age_group  ==  "20-34" ) %>%
+# ---- phase-1-graph-3 --------------------------
+g2d <- ds1 %>% 
+  dplyr::mutate(
+    years_since_2000 = year - 2000
+  ) %>% 
+  # dplyr::filter(area       ==  "British Columbia" ) %>%
+  # dplyr::filter(age_group  ==  "20-34" ) %>%
   dplyr::filter(sex       %in% c("Males","Females") ) %>% 
   ggplot(aes(
-    x      = year
+    x      = years_since_2000 # new
     ,y     = rate
     ,color = sex
   ))+
   geom_point()+
   geom_line( aes(group = sex) )+
+  facet_grid(area ~ age_group)+ # new
+  # facet_grid(age_group ~ area)+ # new
   theme_minimal()+
-  labs( title = "Crude prevalence of MH service utilization in BC among 20-34 year olds")
-g1
+  labs( title = "Crude prevalence of MH service utilization in Canada")
+g2d
+
+# ---- phase-2-make_plot --------------------------
+# suppose, we have settled on the graphical form `g2d`
+g2d <- ds1 %>% 
+  dplyr::mutate(
+    years_since_2000 = year - 2000
+  ) %>% 
+  dplyr::filter(sex       %in% c("Males","Females") ) %>% 
+  ggplot(aes(
+    x      = years_since_2000 # new
+    ,y     = rate
+    ,color = sex
+  ))+
+  geom_point()+
+  geom_line( aes(group = sex) )+
+  facet_grid(area ~ age_group)+ # new
+  theme_minimal()+
+  labs( title = "Crude prevalence of MH service utilization in Canada")
+
 # now let us re-express this plot as a custom function
 make_plot_1 <- function(
   d
 ){
-  # values needed for testing and development inside the function:
-  # d <- ds1 
+  d1 <- d %>% 
+    dplyr::mutate(
+      years_since_2000 = year - 2000
+    )
   
-  # limit external dimensionality
-  g_out <- d %>% 
+  g_out <- d1 %>% 
     ggplot(aes_string(
        x      = "year"
        ,y     = "rate"
@@ -248,20 +272,145 @@ make_plot_1 <- function(
     ))+
     geom_point()+
     geom_line( aes_string(group = "sex") )+
+    facet_grid(area ~ age_group)+
     theme_minimal()+
     labs( title = "Crude prevalence of MH service utilization in BC among 20-34 year olds")
   return(g_out)  
 }
 # how to use:
 ds1 %>% 
-  dplyr::filter(area       ==  "British Columbia" ) %>% 
-  dplyr::filter(age_group  ==  "20-34" ) %>%
   dplyr::filter(sex       %in% c("Males","Females") ) %>% 
   # notice that we keep operations on the data outside of the function definition
   make_plot_1()
 
+# We need our function to offer us a convinient way to:
+# 1. Control the order of the columns
+# 2. Control the order of the rows
+# 3. Control the order and aesthetics of the color dimention
+
+# if we were to pack everything into a single function we would get something like:
+make_plot_1_packed <- function(
+  d
+){
+  # create support objects
+  order_of_age_groups <- d1 %>% 
+    dplyr::arrange() %>% 
+    dplyr::distinct(age_group) %>% 
+    as.list() %>% unlist() %>% as.character()
+  # make total value to be at the end of the vector
+  order_of_age_groups <- c(setdiff(order_of_age_groups,"1+"),"1+")
+  
+  order_of_areas <- d1 %>% 
+    dplyr::distinct(area) %>% 
+    dplyr::arrange(area) %>% 
+    as.list() %>% unlist() %>% as.character()
+  # make total value to be at the beginning of the vector
+  order_of_areas <- c("Canada", setdiff(order_of_areas, "Canada")  )
+  # 
+  d1 <- d %>% 
+    dplyr::mutate(
+      # to create a shorter label
+      years_since_2000 = year - 2000
+      # to enforce the chosen order of the levels:
+      ,area = factor(area, levels = order_of_areas)
+      ,age_group = factor(age_group, levels = order_of_age_groups)
+    )
+  # to customize the color 
+  palette_sex_dark         <- c("#af6ca8", "#5a8fc1") #duller than below. http://colrd.com/image-dna/42282/ & http://colrd.com/image-dna/42275/
+  palette_sex_dark         <- c("#f25091", "#6718f4") #brighter than above. http://colrd.com/palette/42278/
+  pallete_sex_light        <- adjustcolor(palette_sex_dark, alpha.f = .2)
+  names(palette_sex_dark)  <- c("Females", "Males")
+  names(pallete_sex_light) <- names(pallete_sex_light)
+  palette_sex <- c(
+    "Females"       = "#d95f02" # pink
+    ,"Males"        = "#7570b3" # blue
+    ,"Both sexes"   = "#1b9e77" # green
+    )
+  # taken from http://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
+  g_out <- d1 %>% 
+    ggplot(aes_string(
+      x      = "year"
+      ,y     = "rate"
+      ,color = "sex"
+    ))+
+    geom_point()+
+    geom_line( aes_string(group = "sex") )+
+    facet_grid(area ~ age_group)+
+    scale_color_manual(values = palette_sex_dark)+
+    # scale_color_manual(values = pallete_sex_light)+
+    theme_minimal()+
+    labs( title = "Crude prevalence of MH service utilization in BC among 20-34 year olds")
+  return(g_out)  
+}
+# how to use
+ds1 %>% 
+  # to limit the view while in development
+  # dplyr::filter(age_group %in% c("1-19", "20-34", "80+","1+")) %>% 
+  # dplyr::filter(area %in% c("Canada", "Alberta", "British Columbia")) %>% 
+  dplyr::filter(sex %in% c("Males","Females")) %>%
+  make_plot_1_packed()
+
 # ---- prep_data_plot_1 ------------------------------
 
+prep_data_plot_1 <- function(
+  d_input
+  # ,set_area      = c("Canada")
+  # ,set_age_group = c("20-34")
+  # ,set_sex       = c("Males","Females")
+){
+  d_input <- ds1 %>% 
+    # dplyr::filter(area      %in% c(set_area)     ) %>% 
+    # dplyr::filter(age_group %in% c(set_age_group))%>% 
+    # dplyr::filter(sex       %in% c(set_sex)  )  
+    
+  d1 <- d_input
+  
+  return(l_support)
+}
+# how to use
+
+
+# ---- print_plot_1 ---------------------------------
+
+print_plot_1 <- function(
+  l_support
+  ,path_output_folder
+  ,plot_to_print = 
+  ,suffix = NA
+){
+  
+  # add a label to distinguish a particular graph (last element in the file name)
+  if(!is.na(suffix)){
+    (path_save_plot <- paste0(path_output_folder,"class-",class_id_pretty,"-",suffix)) 
+  }else{
+    (path_save_plot <- paste0(path_output_folder,"class-",class_id_pretty)) 
+  }
+  
+  
+  # print the graphical object using jpeg device
+  jpeg(
+    filename = paste0(path_save_plot, ".jpg")
+    ,...
+    # ,width = 1700
+    # ,height = 1100
+    # ,units = "px"
+    # ,pointsize =
+    # ,quality = 100
+    # ,res = 200
+  )
+  
+  l_support$plots[[plot_to_print]] %>% print() # reach into the custom object we made for graphing
+  dev.off() # close the device
+}
+
+# canvas size guide ( portrait orientation )
+
+# Size           Width x Height (mm) Width x Height (in)  Aspect Ratio
+# Half Letter      140 x 216           5.5 x  8.5          1: 1.55
+# Letter           216 x 279           8.5 x 11.0          1: 1.29
+# Legal            216 x 356           8.5 x 14.0          1: 1.65
+# Junior Legal     127 x 203           5.0 x  8.0          1: 1.60
+# Ledger/Tabloid   279 x 432          11.0 x 17.0          1: 1.55
 
 
 # ---- publish ---------------------------------------

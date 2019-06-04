@@ -4,8 +4,8 @@ Collection of scenarios to help learn how to make graphs with ggplot2.
 # Scenarios
 
 1. [Scenario 1][scenario1] - cash, age group, and sex 
-2. [Senario 2][senario2] - suppress for release ( in development)
-2. [Senario 3][senario3] - Reproducible graphs with a (`prep` + `plot` + `print`) triad
+2. [Senario 2][scenario2] - suppress for release ( in development)
+2. [Senario 3][scenario3] - Reproducible graphs with a (`prep` + `plot` + `print`) triad
 
 
 [scenario1]:https://raw.githack.com/dss-ialh/graph-making-scenarios/master/analysis/scenario-1/scenario-1.html

@@ -144,6 +144,11 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 ```{r phase-4-print_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
 ```
 
+```{r phase-4-print_plot-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```
+
+```{r phase-4-print_plot-2, echo=echo_chunks, results="asis", message=message_chunks,out.width="960px"}
+```
 # PHASE 5 - serialize
 
 ```{r phase-5-serialize, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
@@ -152,6 +157,7 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 # PHASE 6 - place plot
 
 ```{r phase-6-place_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+
 ```
 
 # concluding remarks

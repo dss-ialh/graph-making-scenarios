@@ -290,9 +290,9 @@ ds1 %>%
   make_plot_1(measure = "rate")
 
 # ---- phase-2-make_plot-2 --------------------------
-# We need our function to offer us a convinient way to:
-# 1. Control the order of the columns
-# 2. Control the order of the rows
+# We need our function to offer us a convenient way to:
+# 1. Control the order of the columns (and which are displayed)
+# 2. Control the order of the rows    (and which are displayed)
 # 3. Control the order and aesthetics of the color dimention
 
 # if we were to pack everything into a single function we would get something like:
@@ -301,6 +301,7 @@ make_plot_1_packed <- function(
   ,measure
 ){
   d1 <- d
+  # d1 <- ds1 # for testing and development
   # create support objects
   order_of_age_groups <- d1 %>% 
     dplyr::arrange() %>% 
@@ -338,7 +339,7 @@ make_plot_1_packed <- function(
   
   g_out <- d1 %>% 
     ggplot(aes_string(
-      x      = "year"
+      x      = "years_since_2000"
       ,y     = "rate"
       ,color = "sex"
     ))+
@@ -414,7 +415,8 @@ prep_data_plot_1 <- function(
   l_support[["set"]][["sex"]]       <- set_sex
   l_support[["set"]][["area"]]      <- set_area
   l_support[["set"]][["age_group"]] <- set_age_group
-  lapply(l_support, class)
+  lapply(l_support, class) # view contents
+  # the make_plot funtion will rely on the structure and values in l_support
 
   return(l_support)
 }
@@ -435,15 +437,10 @@ make_plot_1 <- function(
 ){
   d <- l_support$data
   # to customize the color 
-  palette_sex <- c(
-    "Females"       = "#d95f02" # pink
-    ,"Males"        = "#7570b3" # blue
-    ,"Both sexes"   = "#1b9e77" # green
-  )
-  # taken from http://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
   # descriptive tag              # green     # red      # blue
   palette_sex_dark         <- c("#1b9e77", "#d95f02", "#7570b3") #duller than below
   # palette_sex_dark         <- c("#66c2a5", "#fc8d62", "#8da0cb") #brighter than above
+  # taken from http://colorbrewer2.org/#type=qualitative&scheme=Dark2&n=3
   pallete_sex_light        <- adjustcolor(palette_sex_dark, alpha.f = .2)
   names(palette_sex_dark)  <- c("Both sexes", "Females", "Males")
   names(pallete_sex_light) <- names(pallete_sex_light)
@@ -461,51 +458,100 @@ make_plot_1 <- function(
     # scale_color_manual(values = pallete_sex_light)+
     theme_minimal()+
     labs( title = "Crude prevalence of MH service utilization in BC among 20-34 year olds")
-  return(g_out)  
+  l_support[["graph"]] <- g_out
+  l_support[["measure"]] <- measure
+  return(l_support)  
 }
 # how to use
-g1 <- ds1 %>% 
+l_support <- ds1 %>% 
   prep_data_plot_1(
     set_sex        = c("Females", "Males", "Both sexes") 
     ,set_area      = c("Canada", "Alberta", "British Columbia") 
     ,set_age_group = c("1-19", "20-34", "80+","1+")
   ) %>% 
-  make_plot_1(measure = "rate") # rate (rate_cv), number, population
-g1
+  make_plot_1(measure = "rate")
+l_support$graph %>% print()
 
-# ---- print_plot_1 ---------------------------------
+# ---- phase-4-print_plot ---------------------------------
 
 print_plot_1 <- function(
   l_support
   ,path_output_folder
-  ,plot_to_print = 
-  ,suffix = NA
+  ,prefex     = NA
+  ,graph_name = "auto"
+  ,...
 ){
-  
-  # add a label to distinguish a particular graph (last element in the file name)
-  if(!is.na(suffix)){
-    (path_save_plot <- paste0(path_output_folder,"class-",class_id_pretty,"-",suffix)) 
+  if( graph_name == "auto" ){
+    graph_name <- paste0(
+      # should be replaced with features appropriate for analysis
+      l_support$measure
+      ,"-("
+      ,l_support$set$sex %>% paste0(collapse = "-")
+      ,")-("
+      ,l_support$set$area %>% paste0(collapse = "-")
+      ,")-("
+      ,l_support$set$age_group %>% paste0(collapse = "-")
+      ,")"
+      ,collapse = "-"
+    )
   }else{
-    (path_save_plot <- paste0(path_output_folder,"class-",class_id_pretty)) 
+    graph_name <- paste0(l_support$measure,"-", graph_name)
   }
-  
-  
-  # print the graphical object using jpeg device
-  jpeg(
-    filename = paste0(path_save_plot, ".jpg")
-    ,...
-    # ,width = 1700
-    # ,height = 1100
-    # ,units = "px"
-    # ,pointsize =
-    # ,quality = 100
-    # ,res = 200
-  )
-  
-  l_support$plots[[plot_to_print]] %>% print() # reach into the custom object we made for graphing
-  dev.off() # close the device
-}
+  # add a label to distinguish a particular graph (last element in the file name)
+  if( !is.na(prefex) ){ # inserts a PREFEX before the graph name
+    (path_save_plot <- paste0(path_output_folder, prefex,"-",graph_name) )
+  }else{
+    ( path_save_plot <- paste0(path_output_folder, graph_name) )
+  }
 
+  # if folder does not exist yet, create it
+  if( !dir.exists(path_output_folder) ){
+    dir.create(path_output_folder)
+  }
+  # print the graphical object using jpeg device
+  path_printed_plot <- paste0(path_save_plot, ".jpg")
+  jpeg(
+    filename = path_printed_plot
+    ,...
+  )
+  l_support$graph %>% print() # reach into the custom object we made for graphing
+  dev.off() # close the device
+  l_support[["path_plot"]] <- path_printed_plot
+  return(l_support)
+}
+# how to use
+l_support <- ds1 %>% 
+  prep_data_plot_1(
+    set_sex        = c("Females", "Males", "Both sexes") 
+    ,set_area      = c("Canada", "Alberta", "British Columbia") 
+    ,set_age_group = c("1-19", "20-34", "80+","1+")
+  ) %>% 
+  make_plot_1(
+    measure = "rate"
+  ) %>% 
+  print_plot_1(
+    path_output_folder = "./analysis/scenario-3/prints/demo-1/"
+    # ,prefex            = "attempt1"
+    # ,graph_name        = "take1" # `auto` by default
+# options added through `...` into the jpeg() function   
+    ,width   = 1700
+    ,height  = 500
+    ,units   = "px"
+    ,quality = 100
+    ,res     = 200
+  )
+# notice that if I print the GRAPH by reaching into the `l_support` object
+# if will be displayed according to the `fig.width`, `fig.height`, and `out.width`
+# parameters specified in the chuck options (in the .Rmd file)
+l_support$graph %>% print()
+
+# if, however, we reach into the disk, we will recover the image generated
+# with the dimensions and specs defined in the `print_plot` function
+l_support$path_plot
+l_support$path_plot %>% jpeg::readJPEG() %>% grid::grid.raster()
+
+
+# ---- ----------------------
 # canvas size guide ( portrait orientation )
 
 # Size           Width x Height (mm) Width x Height (in)  Aspect Ratio
@@ -515,6 +561,13 @@ print_plot_1 <- function(
 # Junior Legal     127 x 203           5.0 x  8.0          1: 1.60
 # Ledger/Tabloid   279 x 432          11.0 x 17.0          1: 1.55
 
+
+# ---- phase-5-serialize ---------------------------------
+# 
+
+# ---- phase-6-place_plot ---------------------------------
+l_support$path_plot
+l_support$path_plot %>% jpeg::readJPEG() %>% grid::grid.raster()
 
 # ---- publish ---------------------------------------
 # This chunk will publish the summative report

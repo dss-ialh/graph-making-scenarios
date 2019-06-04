@@ -149,6 +149,7 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 
 ```{r phase-4-print_plot-2, echo=echo_chunks, results="asis", message=message_chunks,out.width="960px"}
 ```
+
 # PHASE 5 - serialize
 
 ```{r phase-5-serialize, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
@@ -162,6 +163,7 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 
 # concluding remarks
 
+Please note that this is not a "method" or a "framework", but merely an example of how to organize a particular comparison. 
 
 # future direction
 

@@ -1,4 +1,6 @@
-Collection of scenarios to help learn how to make graphs with ggplot2. 
+![](libs/images/avatar-rectangle.svg)
+
+Collection of scenarios to help learn making graphs with ggplot2. 
 
 
 # Scenarios

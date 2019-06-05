@@ -15,7 +15,7 @@ output:
 
 # overview
 
-This document narrates the demonstration of the `(prep + plot + print) + place` technique using the data from Canadian Chronic Disease Survaillance System (CCDSS).
+This document narrates the demonstration of the `(prep + plot + print) + place` technique using the data from Canadian Chronic Disease Surveillance System (CCDSS).
 
 We will proceed in the following sequence of phases:
 

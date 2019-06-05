@@ -1,0 +1,173 @@
+---
+title: "Graphing p4:"
+date: "Date: `r Sys.Date()`"
+output: 
+# radix::radix_article: # radix is a newer alternative that has some advantages over `html_document`.
+  html_document: 
+    keep_md: no
+    toc: yes
+    toc_float: 
+      collapsed: true
+      smooth_scroll: true
+    highlight: tango
+    theme: spacelab
+---
+
+# overview
+
+This document narrates the demonstration of the `(prep + plot + print) + place` technique using the data from ... .
+
+We will proceed in the following sequence of phases:
+
+- PHASE 0 - explore the data
+- PHASE 1 - build the plot
+- PHASE 2 - build the `plot` function
+- PHASE 3 - isolate the `prep` step
+- PHASE 4 - isolate the `print` step
+- PHASE 5 - serialize graph production
+- PHASE 6 - how to `place` graphs onto the canvas
+
+
+<!--  Set the working directory to the repository's base directory; this assumes the report is nested inside of two directories.-->
+```{r, echo=F, message=F} 
+# cat("Working directory: ", getwd())
+library(knitr)
+opts_knit$set(root.dir='../../')  #Don't combine this call with any other chunk -especially one that uses file paths.
+```
+
+<!-- Set the report-wide options, and point to the external code file. -->
+```{r set-options, echo=F}
+# cat("Working directory: ", getwd())
+report_render_start_time <- Sys.time()
+opts_chunk$set(
+  results      = 'show', 
+  comment      = NA, 
+  tidy         = FALSE,
+  # dpi        = 400,
+  # out.width  = "650px", #This affects only the markdown, not the underlying png file.  The height will be scaled appropriately.
+  fig.width    = 7, 
+  fig.height   = 4, 
+  fig.path     = 'figure-png/'
+)
+
+echo_chunks    <- TRUE #Toggle for debugging.
+message_chunks <- FALSE #Toggle for debugging.
+options(width=100) #So the output is 25% wider than the default.
+read_chunk("./analysis/.../rfile.R") #This allows knitr to call chunks tagged in the underlying *.R file.
+```
+# set the scene
+
+## load packages
+<!-- Load packages, or at least verify they're available on the local machine.  Suppress the output when loading packages. --> 
+```{r load-packages, echo=echo_chunks, message=message_chunks}
+```
+## load sources
+<!-- Load 'sourced' R files.  Suppress the output when loading sources. --> 
+```{r load-sources, echo=echo_chunks, message=message_chunks}
+```
+## declare globals
+<!-- Load any global functions and variables declared in the R file.  Suppress the output. --> 
+```{r declare-globals, echo=echo_chunks, results='show', message=message_chunks}
+```
+
+<!-- Declare any global functions specific to a Rmd output.  Suppress the output. -->
+```{r rmd-specific, echo=echo_chunks, message=message_chunks}
+# Put presentation-specific code in here.  It doesn't call a chunk in the codebehind file.
+#   It should be rare (and used cautiously), but sometimes it makes sense to include code in Rmd 
+#   that doesn't live in the codebehind R file.
+```
+## load data
+<!-- Load the datasets.   -->
+```{r load-data, echo=echo_chunks, results='show', message=message_chunks}
+```
+
+# PHASE 0 - explore 
+
+## tweak data
+<!-- Tweak the datasets.   -->
+```{r tweak-data, echo=echo_chunks, results='show', message=message_chunks}
+```
+## inspect-1 raw
+```{r inspect-data-1, echo=echo_chunks, results='show', message=message_chunks}
+```
+## declare components
+```{r declare-components, echo=echo_chunks, results='show', message=message_chunks}
+```
+## inspect-2 categorical
+```{r inspect-data-2, echo=echo_chunks, results='asis', message=FALSE}
+```
+
+## inspect-3 continuous
+```{r inspect-data-3, echo=echo_chunks, results='asis', message=message_chunks}
+```
+
+# PHASE 1 - graph
+
+## sketch the space
+```{r phase-1-graph, echo=echo_chunks, results='show', message=message_chunks}
+```
+
+## graph-1 basic
+```{r phase-1-graph-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```
+
+# PHASE 2 - make plot
+
+```{r phase-2-make_plot, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7,out.width="960px"}
+```
+
+```{r phase-2-make_plot-1, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=17,out.width="960px"}
+```
+
+# PHASE 3 - prep data
+
+```{r  phase-3-prep_data-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```
+
+# PHASE 4 - print plot
+
+```{r phase-4-print_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```
+
+```{r phase-4-print_plot-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```
+
+# PHASE 5 - serialize
+
+```{r phase-5-serialize, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```
+
+# PHASE 6 - place plot
+
+```{r phase-6-place_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+
+```
+
+# concluding remarks
+
+Please note that this is not a "method" or a "framework", but merely an example of how to organize a particular comparison. 
+
+# future direction
+
+
+session information
+===========================================================================
+
+For the sake of documentation and reproducibility, the current report was rendered in the following environment.  Click the line below to expand.
+
+<details>
+  <summary>Environment <span class="glyphicon glyphicon-plus-sign"></span></summary>
+```{r session-info, echo=FALSE}
+if( requireNamespace("devtools", quietly = TRUE) ) {
+  devtools::session_info()
+} else {
+  sessionInfo()
+} 
+```
+</details>
+
+```{r session-duration, echo=FALSE}
+report_render_duration_in_seconds <- round(as.numeric(difftime(Sys.time(), report_render_start_time, units="secs")))
+```
+
+Report rendered by `r Sys.info()["user"]` at `r strftime(Sys.time(), "%Y-%m-%d, %H:%M %z")` in `r report_render_duration_in_seconds` seconds.

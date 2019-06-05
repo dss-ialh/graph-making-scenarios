@@ -10,9 +10,12 @@ Collection of scenarios to help learn making graphs with ggplot2.
 3. [Senario 3][scenario3] - Reproducible graphs with a (`prep` + `plot` + `print`) triad
     - [session promo][session3overview]
     - [data description][data_scenario_3]
+    - [session handout][session3handout]
+    
 
 
 [session3overview]:https://raw.githack.com/dss-ialh/graph-making-scenarios/master/libs/materials/promo/dss-2019-06-05-reproducible-graphs-session-3-promo.pdf
+[session3handout]:libs/materials/dss-2019-06-05-session-handout.pdf
 [data_scenario_3]:data-public/raw/scenario-3/README.md
 
 [scenario1]:https://raw.githack.com/dss-ialh/graph-making-scenarios/master/analysis/scenario-1/scenario-1.html

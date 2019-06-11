@@ -11,11 +11,19 @@ output:
       smooth_scroll: true
     highlight: tango
     theme: spacelab
+  pdf_document:
+    toc: true
+    number_sections: true
+    fig_width: 7
+    fig_height: 6
+    fig_caption: true
+    df_print: kable
+    highlight: tango
 ---
 
 # overview
 
-This document narrates the demonstration of the `(prep + plot + print) + place` technique using the data from Canadian Chronic Disease Survaillance System (CCDSS).
+This document narrates the demonstration of the `(prep + plot + print) + place` technique using the data from Canadian Chronic Disease Survaillance System (CCDSS). View data description on [this README.md](https://github.com/dss-ialh/graph-making-scenarios/blob/master/data-public/raw/scenario-3/README.md).
 
 We will proceed in the following sequence of phases:
 
@@ -52,6 +60,7 @@ opts_chunk$set(
 
 echo_chunks    <- TRUE #Toggle for debugging.
 message_chunks <- FALSE #Toggle for debugging.
+warning_chunks <- FALSE
 options(width=100) #So the output is 25% wider than the default.
 read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to call chunks tagged in the underlying *.R file.
 ```
@@ -59,109 +68,110 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 
 ## load packages
 <!-- Load packages, or at least verify they're available on the local machine.  Suppress the output when loading packages. --> 
-```{r load-packages, echo=echo_chunks, message=message_chunks}
+```{r load-packages, echo=echo_chunks, message=message_chunks,warning=warning_chunks}
 ```
 ## load sources
 <!-- Load 'sourced' R files.  Suppress the output when loading sources. --> 
-```{r load-sources, echo=echo_chunks, message=message_chunks}
+```{r load-sources, echo=echo_chunks, message=message_chunks,warning=warning_chunks}
 ```
 ## declare globals
 <!-- Load any global functions and variables declared in the R file.  Suppress the output. --> 
-```{r declare-globals, echo=echo_chunks, results='show', message=message_chunks}
+```{r declare-globals, echo=echo_chunks, results='show', message=message_chunks,warning=warning_chunks}
 ```
 
 <!-- Declare any global functions specific to a Rmd output.  Suppress the output. -->
-```{r rmd-specific, echo=echo_chunks, message=message_chunks}
+```{r rmd-specific, echo=echo_chunks, message=message_chunks,warning=warning_chunks}
 # Put presentation-specific code in here.  It doesn't call a chunk in the codebehind file.
 #   It should be rare (and used cautiously), but sometimes it makes sense to include code in Rmd 
 #   that doesn't live in the codebehind R file.
 ```
 ## load data
 <!-- Load the datasets.   -->
-```{r load-data, echo=echo_chunks, results='show', message=message_chunks}
+```{r load-data, echo=echo_chunks, results='show', message=message_chunks,warning=warning_chunks}
 ```
 
 # PHASE 0 - explore 
 
 ## tweak data
 <!-- Tweak the datasets.   -->
-```{r tweak-data, echo=echo_chunks, results='show', message=message_chunks}
+```{r tweak-data, echo=echo_chunks, results='show', message=message_chunks,warning=warning_chunks}
 ```
 ## inspect-1 raw
-```{r inspect-data-1, echo=echo_chunks, results='show', message=message_chunks}
+```{r inspect-data-1, echo=echo_chunks, results='show', message=message_chunks,warning=warning_chunks}
 ```
 ## declare components
-```{r declare-components, echo=echo_chunks, results='show', message=message_chunks}
+```{r declare-components, echo=echo_chunks, results='show', message=message_chunks,warning=warning_chunks}
 ```
 ## inspect-2 categorical
-```{r inspect-data-2, echo=echo_chunks, results='asis', message=FALSE}
+```{r inspect-data-2, echo=echo_chunks, results='asis', message=FALSE,warning=warning_chunks}
 ```
 
 ## inspect-3 continuous
-```{r inspect-data-3, echo=echo_chunks, results='asis', message=message_chunks}
+```{r inspect-data-3, echo=echo_chunks, results='asis', message=message_chunks,warning=warning_chunks}
 ```
 
 # PHASE 1 - graph
 
 ## sketch the space
-```{r phase-1-graph, echo=echo_chunks, results='show', message=message_chunks}
+```{r phase-1-graph, echo=echo_chunks, results='show', message=message_chunks,warning=warning_chunks}
 ```
 
 ## graph-1 basic
-```{r phase-1-graph-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```{r phase-1-graph-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px",warning=warning_chunks}
 ```
 
 ## graph-2 wrap
-```{r phase-1-graph-2, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7, out.width="960px", warning = FALSE}
+```{r phase-1-graph-2, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7, out.width="960px", warning = FALSE,warning=warning_chunks}
 ```
 
 ## graph-2 grid
 
-```{r phase-1-graph-3, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7, out.width="960px", warning = FALSE}
+```{r phase-1-graph-3, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7, out.width="960px", warning = FALSE,warning=warning_chunks}
 ```
 
-```{r phase-1-graph-4, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=16, out.width="960px", warning = FALSE}
+```{r phase-1-graph-4, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=16, out.width="960px",warning=warning_chunks}
 ```
 
 # PHASE 2 - make plot
 
-```{r phase-2-make_plot, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7,out.width="960px"}
+```{r phase-2-make_plot, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7,out.width="960px",warning=warning_chunks}
 ```
 
-```{r phase-2-make_plot-1, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=17,out.width="960px"}
+```{r phase-2-make_plot-1, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=17,out.width="960px",warning=warning_chunks}
 ```
 
-```{r phase-2-make_plot-2, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7,out.width="960px"}
+```{r phase-2-make_plot-2, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7,out.width="960px",warning=warning_chunks}
 ```
 
 # PHASE 3 - prep data
 
-```{r  phase-3-prep_data-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```{r  phase-3-prep_data-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px",warning=warning_chunks}
 ```
 
 # PHASE 4 - print plot
 
-```{r phase-4-print_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```{r phase-4-print_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px",warning=warning_chunks}
 ```
 
-```{r phase-4-print_plot-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```{r phase-4-print_plot-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px",warning=warning_chunks}
 ```
 
-```{r phase-4-print_plot-2, echo=echo_chunks, results="asis", message=message_chunks,out.width="960px"}
+```{r phase-4-print_plot-2, echo=echo_chunks, results="asis", message=message_chunks,out.width="960px",warning=warning_chunks}
 ```
 
 # PHASE 5 - serialize
 
-```{r phase-5-serialize, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```{r phase-5-serialize, echo=echo_chunks, results='show', message=message_chunks,out.width="960px",warning=warning_chunks}
 ```
 
 # PHASE 6 - place plot
 
-```{r phase-6-place_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px"}
+```{r phase-6-place_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px",warning=warning_chunks}
 
 ```
 
 # concluding remarks
+
 
 Please note that this is not a "method" or a "framework", but merely an example of how to organize a particular comparison. 
 

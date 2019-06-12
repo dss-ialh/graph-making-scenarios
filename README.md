@@ -1,4 +1,4 @@
-![](libs/images/dss-logo-url-400px.jpg)
+![](libs/images/dss-logo-400px.jpg)
 
 Collection of scenarios to help learn making graphs with ggplot2. 
 

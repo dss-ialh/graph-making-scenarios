@@ -313,9 +313,9 @@ l_support %>%
 
 
 # ---- phase-6-place_plot ---------------------------------
-l_support <- readRDS("./analysis/scenario-3/prints/series_1/ls_plots.rds")
-l_support[["British Columbia"]]$path_plot
-l_support[["British Columbia"]]$path_plot %>% jpeg::readJPEG() %>% grid::grid.raster()
+# l_support <- readRDS("./analysis/scenario-3/prints/series_1/ls_plots.rds")
+# l_support[["British Columbia"]]$path_plot
+# l_support[["British Columbia"]]$path_plot %>% jpeg::readJPEG() %>% grid::grid.raster()
 
 # ---- publish ---------------------------------------
 # This chunk will publish the summative report

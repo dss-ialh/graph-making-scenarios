@@ -1,6 +1,7 @@
 ---
 title: "Scenario 3: CCDSS"
 date: "Date: `r Sys.Date()`"
+author: "Andriy Koval"
 output: 
 # radix::radix_article: # radix is a newer alternative that has some advantages over `html_document`.
   html_document: 
@@ -11,21 +12,15 @@ output:
       smooth_scroll: true
     highlight: tango
     theme: spacelab
-  pdf_document:
-    toc: true
-    number_sections: true
-    fig_width: 7
-    fig_height: 6
-    fig_caption: true
-    df_print: kable
-    highlight: tango
 ---
 
 # overview
 
 This document narrates the demonstration of the `(prep + plot + print) + place` technique using the data from Canadian Chronic Disease Survaillance System (CCDSS). View data description on [this README.md](https://github.com/dss-ialh/graph-making-scenarios/blob/master/data-public/raw/scenario-3/README.md).
 
-We will proceed in the following sequence of phases:
+Another demonstration of this technique was created data from VADA 2019 Summer School Data Challenge. See  [github.com/andkov/vada-2019-summer-school](https://github.com/andkov/vada-2019-summer-school) repository for reproducible scripts. The data, however, is not available publically. Please contact VADA program coordinator to enquire about data access. 
+
+We will proceed building a system for reproducible graphing in the following sequence of phases:
 
 - PHASE 0 - explore the data
 - PHASE 1 - build the plot
@@ -33,7 +28,27 @@ We will proceed in the following sequence of phases:
 - PHASE 3 - isolate the `prep` step
 - PHASE 4 - isolate the `print` step
 - PHASE 5 - serialize graph production
-- PHASE 6 - how to `place` graphs onto the canvas
+- PHASE 6 - `place` graphs onto the canvas
+
+
+## disclaimer
+
+ - This essay is more about making graphs than about analyzing data
+ - This essay is more about demonstrating a technique than about prescribing a framework.
+
+## mindset
+
+Data scientists describe the ultimate reality about data using various dialets of expression. Each translation has its benefits and disadvantages. We need them all to tell a good story.    
+  
+![][dialects_data]
+
+No one language is better than the other. Each allows for different shades of distinction in model specification. 
+
+![][dialects_model]
+
+[dialects_data]:../../libs/images/dialects/data-expression.PNG 
+[dialects_model]:../../libs/images/dialects/model-expression.PNG 
+
 
 
 <!--  Set the working directory to the repository's base directory; this assumes the report is nested inside of two directories.-->
@@ -165,17 +180,12 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 ```
 
 # PHASE 6 - place plot
-
-```{r phase-6-place_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px",warning=warning_chunks}
+```{r phase-6-place_plot, echo=echo_chunks, results='show', message=message_chunks,out.width="960px",warning=warning_chunks, eval = TRUE}
 
 ```
 
-# concluding remarks
 
-
-Please note that this is not a "method" or a "framework", but merely an example of how to organize a particular comparison. 
-
-# future direction
+# future directions
 
 - how to incorporate additional condition? (i.e. `anxiety_mood` instead of `mental_health`)
 - how to add additional INTERNAL dimension? (i.e. `marital_status`)

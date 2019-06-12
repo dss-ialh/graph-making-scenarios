@@ -23,7 +23,7 @@ base::source("./scripts/graphing/graph-presets.R") # fonts, colors, themes
 # location of the data sources
 path_input  <- "./data-public/raw/scenario-3/PHAC_Infobase_CCDSS_-8586421808967913043.csv" # mental illness
 # path_input   <- "./data-public/raw/scenario-3/PHAC_Infobase_CCDSS_-8586421810172823624.csv" # anxiety & mood
-
+output_format = "pandoc"
 # ---- rmd-specific ----------------------------
 
 # ---- load-data -------------------------------
@@ -119,11 +119,11 @@ ds1 %>%
 
 #  II - VISUALIZATION space 
 
-## INTERNAL - horizontal - TIME    - (year) 
-## INTERNAL - vertical   - MEASURE - (rate)  
-## INTERNAL - color      - DESIGN  - (sex)
-## EXTERNAL - horizontal - DESIGN  - (area)
-## EXTERNAL - vertial    - DESIGN  - (age_group)
+## INNER - horizontal - TIME    - (year) 
+## INNER - vertical   - MEASURE - (rate)  
+## INNER - color      - DESIGN  - (sex)
+## OUTER - horizontal - DESIGN  - (area)
+## OUTER - vertial    - DESIGN  - (age_group)
 
 
 # ---- phase-1-graph-1 --------------------------
@@ -280,7 +280,7 @@ make_plot_1_basic <- function(
     geom_line( aes_string(group = "sex") )+
     facet_grid(area ~ age_group)+
     theme_minimal()+
-    labs( title = "Crude prevalence of MH service utilization in BC among 20-34 year olds")
+    labs( title = "Crude prevalence of MH service utilization in Canada")
   return(g_out)  
 }
 # how to use:
@@ -556,7 +556,7 @@ l_support$path_plot %>% jpeg::readJPEG() %>% grid::grid.raster()
 # it often makes sense to genrate a series of plot to be explored manually
 
 # GRAPH SERIES 1
-path_target <- "./analysis/scenario-3/prints/series_1/"
+path_target           <- "./analysis/scenario-3/prints/series_1/"
 provinces_to_pair     <- c("British Columbia", "Alberta", "Quebec")
 age_groups_to_display <- c("1-19", "20-34", "35-49", "50-64","65-79","80+","+1")
 # for each selected province create a comparison with Canada
@@ -584,8 +584,8 @@ for(province_i in provinces_to_pair){
 saveRDS(ls_plot_series, paste0(path_target,"ls_plots.rds") )
 
 # GRAPH SERIES 2
-path_target <- "./analysis/scenario-3/prints/series_2/"
-provinces_to_pair    <- c("British Columbia", "Alberta", "Quebec")
+path_target           <- "./analysis/scenario-3/prints/series_2/"
+provinces_to_pair     <- c("British Columbia", "Alberta", "Quebec")
 age_groups_to_display <- c( "+1")
 # for each selected province create a comparison with Canada
 ls_plot_series <- list()
@@ -630,10 +630,10 @@ testit::assert("The knitr Rmd files should exist.", base::file.exists(pathFilesT
 for( pathFile in pathFilesToBuild ) {
   rmarkdown::render(input = pathFile,
                     output_format=c(
-                      "html_document"   
+                      "html_document"
                       # "pdf_document"
                       # ,"md_document"
-                      # "word_document" 
+                      # "word_document"
                     ),
                     clean=TRUE)
 }

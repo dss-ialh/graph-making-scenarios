@@ -1,24 +1,25 @@
 ---
 title: "Scenario 3: CCDSS"
-date: "Date: `r Sys.Date()`"
 author: "Andriy Koval"
+date: |
+  Created on 2019-06-05. \
+  Updated on `r Sys.Date()`.
 output: 
-# radix::radix_article: # radix is a newer alternative that has some advantages over `html_document`.
+  # works
   html_document: 
-    keep_md: no
+    highlight: tango
+    theme: spacelab
     toc: yes
     toc_float: 
       collapsed: true
       smooth_scroll: true
-    highlight: tango
-    theme: spacelab
+  pdf_document: default
 ---
-
 # overview
 
-This document narrates the demonstration of the `(prep + plot + print) + place` technique using the data from Canadian Chronic Disease Survaillance System (CCDSS). View data description on [this README.md](https://github.com/dss-ialh/graph-making-scenarios/blob/master/data-public/raw/scenario-3/README.md).
+This document narrates the demonstration of the `(prep + plot + print)` technique using the data from Canadian Chronic Disease Survaillance System (CCDSS). We follow the phases of transforming a concept `ggplot2` plot into a sequence of custom functions that automate graph production. View data description on [this README.md](https://github.com/dss-ialh/graph-making-scenarios/blob/master/data-public/raw/scenario-3/README.md).
 
-Another demonstration of this technique was created data from VADA 2019 Summer School Data Challenge. See  [github.com/andkov/vada-2019-summer-school](https://github.com/andkov/vada-2019-summer-school) repository for reproducible scripts. The data, however, is not available publically. Please contact VADA program coordinator to enquire about data access. 
+Another demonstration of this technique was created data from VADA 2019 Summer School Data Challenge. See  [github.com/andkov/vada-2019-summer-school](https://github.com/andkov/vada-2019-summer-school) repository for reproducible scripts. The data, however, is not available publically. Please contact [VADA program](http://vada.cs.umanitoba.ca/contact/) coordinator to enquire about data access. 
 
 We will proceed building a system for reproducible graphing in the following sequence of phases:
 
@@ -30,11 +31,12 @@ We will proceed building a system for reproducible graphing in the following seq
 - PHASE 5 - serialize graph production
 - PHASE 6 - `place` graphs onto the canvas
 
+Each phase marks a milestone in the expanding complexity of the visualization system. 
 
 ## disclaimer
 
  - This essay is more about making graphs than about analyzing data
- - This essay is more about demonstrating a technique than about prescribing a framework.
+ - This essay is more about demonstrating a technique than about prescribing a framework. ([_"Frameworks are like toothbrushes: everyone's got one and no-one wants to use anyone else's"_](https://twitter.com/trishgreenhalgh/status/891674763285942272))
 
 ## mindset
 
@@ -48,8 +50,6 @@ No one language is better than the other. Each allows for different shades of di
 
 [dialects_data]:../../libs/images/dialects/data-expression.PNG 
 [dialects_model]:../../libs/images/dialects/model-expression.PNG 
-
-
 
 <!--  Set the working directory to the repository's base directory; this assumes the report is nested inside of two directories.-->
 ```{r, echo=F, message=F} 
@@ -70,7 +70,9 @@ opts_chunk$set(
   # out.width  = "650px", #This affects only the markdown, not the underlying png file.  The height will be scaled appropriately.
   fig.width    = 7, 
   fig.height   = 4, 
-  fig.path     = 'figure-png/'
+  fig.path     = 'figure-png/',
+  class.source = "numberLines lineAnchors", 
+  class.output = c("numberLines lineAnchors chunkout")
 )
 
 echo_chunks    <- TRUE #Toggle for debugging.
@@ -101,6 +103,8 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 #   that doesn't live in the codebehind R file.
 ```
 ## load data
+
+View [`./data-unshared/contents.md`](https://github.com/dss-ialh/graph-making-scenarios/tree/master/data-public/raw/scenario-3) for data dictionary and the retrieval specifications. 
 <!-- Load the datasets.   -->
 ```{r load-data, echo=echo_chunks, results='show', message=message_chunks,warning=warning_chunks}
 ```
@@ -128,11 +132,13 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 # PHASE 1 - graph
 
 ## sketch the space
+
 ```{r phase-1-graph, echo=echo_chunks, results='show', message=message_chunks,warning=warning_chunks}
 ```
 
+
 ## graph-1 basic
-```{r phase-1-graph-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px",warning=warning_chunks}
+```{r phase-1-graph-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px",warning=warning_chunks, out.width = "700px"}
 ```
 
 ## graph-2 wrap
@@ -152,7 +158,7 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 ```{r phase-2-make_plot, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7,out.width="960px",warning=warning_chunks}
 ```
 
-```{r phase-2-make_plot-1, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=17,out.width="960px",warning=warning_chunks}
+```{r phase-2-make_plot-1, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7,out.width="960px",warning=warning_chunks}
 ```
 
 ```{r phase-2-make_plot-2, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height=7,out.width="960px",warning=warning_chunks}
@@ -160,7 +166,7 @@ read_chunk("./analysis/scenario-3/scenario-3-ccdss.R") #This allows knitr to cal
 
 # PHASE 3 - prep data
 
-```{r  phase-3-prep_data-1, echo=echo_chunks, results='show', message=message_chunks,out.width="960px",warning=warning_chunks}
+```{r  phase-3-prep_data-1, echo=echo_chunks, results='show', message=message_chunks,fig.width=11, fig.height = 4, out.width="960px",warning=warning_chunks}
 ```
 
 # PHASE 4 - print plot

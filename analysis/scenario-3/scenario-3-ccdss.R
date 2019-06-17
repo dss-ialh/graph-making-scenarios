@@ -8,6 +8,8 @@ library(magrittr)          # enables piping : %>%
 library(dplyr)             # data wrangling
 library(knitr)             # tables
 library(ggplot2)           # graphs
+library(viridis)           # for colorblind friendly color palettes
+requireNamespace("dplyr")  # data wrangling
 requireNamespace("readr")  # for data input
 requireNamespace("tidyr")  # for data manipulation
 requireNamespace("testit") # for asserting conditions meet expected patterns
@@ -29,14 +31,12 @@ output_format = "pandoc"
 # ---- load-data -------------------------------
 # see ./data-unshared/contents.md for origin of the data
 ds0 <- path_input %>% readr::read_csv(skip = 3) %>% tibble::as_tibble()
-
-# see data dictionary at http://infobase.phac-aspc.gc.ca/cubes/ccdss-eng.html
-ds0 %>% dplyr::glimpse(80)
+ds0 %>% dplyr::glimpse()
 
 # ---- tweak-data ------------------------------
 # to trace the tweaks
 ds1 <- ds0 # start with the identical copy
-# correct variable names
+# to systematize variable name for easier remembering and typing
 names(ds1) <- gsub(" ","_", names(ds1)) # to make into a single word (all word chars)
 names(ds1) <- gsub("%","", names(ds1))  # to remove special characters
 names(ds1) <- tolower(names(ds1))       # to standardize spellining
@@ -48,16 +48,15 @@ ds1 <- ds1 %>%
     age_group = gsub("'","",age_group) # to remove extra set of quotes
   ) %>% 
   dplyr::filter(!is.na(condition)) # to remove notes at the end of the spreadsheet
-
 ds1 %>% dplyr::glimpse(80)
 
 # ---- inspect-data-1 ----------------------------
-# for demontrating custom function principle:
+# to demonstrate the principle of custom functions
 print_distinct <- function(
   d
   ,group_by_variables
 ){
-  # values needed for testing and development inside the function:
+  # define values needed for testing and development inside the function:
   # d <- ds0
   # group_by_variables <- "area"
   # group_by_variables <- c("area","age_group")
@@ -70,17 +69,19 @@ print_distinct <- function(
 }
 # How to use
 ds1 %>% print_distinct(group_by_variables = "area")
+# to demonstrate how to vary the input (values for the argument of the function)
 # ds1 %>% print_distinct(group_by_variables = "condition")
 # ds1 %>% print_distinct(group_by_variables = "age_group")
 # ds1 %>% print_distinct(group_by_variables = c("area","age_group") )
+# TODO: instead of `n` compute the average of a specific variable
 
 # ---- declare-components ----------------------
-# to help with looping and wrangling
-categorical_variables <- c("area","condition", "age_group", "sex","year")
-continuous_variables  <- c(
+# to help remember how each variable could be used during serial application
+varnames_categorical <- c("area","condition", "age_group", "sex","year")
+varnames_continuous  <- c(
   "rate", "rate_cv", "rate_95_ci_lower","rate_95_ci_upper", "number","population"
 )
-# to help with targeted application 
+# to help with mapping data space into the visualization space
 varnames_rate     <- c("rate", "rate_cv","rate_95_ci_lower","rate_95_ci_upper")
 varnames_measure  <- c(varnames_rate,"number","population" )
 varnames_time     <- c("year")
@@ -88,7 +89,7 @@ varnames_design   <- c("area","age_group","sex", "condition")
 
 # ---- inspect-data-2 --------------------------
 # to explore the scles of the CATEGORICAL variables
-for(i in categorical_variables){
+for(i in varnames_categorical){
   ds1 %>% 
     print_distinct( group_by_variables = i ) %>%
     neat() %>% # to apply custom style for html canvas
@@ -98,17 +99,16 @@ for(i in categorical_variables){
 # ---- inspect-data-3 --------------------------
 # to explore the scales of CONTINUOUS variables
 ds1 %>% 
-  dplyr::select_(.dots = continuous_variables) %>% 
+  dplyr::select_(.dots = varnames_continuous) %>% 
   explore::describe() %>% neat()
 
-
 # ---- phase-1-graph -----------------------
-# now let us find ways to look at/in/with data
+# now let us find ways to look at/in/with data.
 # the above analysis helps us to conceptualize available variables as:
 
 #  I - DATA space
 
-## MEASURE - rate       # crude rate (not age-adjusted)   # includes (cv, ci_upper, ci_lower) 
+## MEASURE - rate       # crude rate (includes cv, ci_upper, ci_lower) 
 ## MEASURE - number     # count of cases of the condition
 ## MEASURE - population # total alive
 ## TIME    - year       # fiscal
@@ -125,10 +125,9 @@ ds1 %>%
 ## OUTER - horizontal - DESIGN  - (area)
 ## OUTER - vertial    - DESIGN  - (age_group)
 
-
 # ---- phase-1-graph-1 --------------------------
-# let us sketch the most basic graph in 3 internal dimensions
-# notice that we isolate a single value on all the rest dimensions
+# let us sketch the most basic graph in 3 internal dimensions of our blueprint
+# notice that we isolate a single value on all other dimensions
 g1 <- ds1 %>% 
   dplyr::filter(area       ==  "British Columbia" ) %>% 
   dplyr::filter(age_group  ==  "20-34" ) %>%
@@ -144,7 +143,7 @@ g1 <- ds1 %>%
   labs( title = "Crude prevalence of MH service utilization in BC among 20-34 year olds")
 g1
 
-# to add a few bells and whistles that aid quick evaluation
+# to demonstrate how we can enhance the effectiveness of information display
 g1a <- ds1 %>% 
   dplyr::filter(area       ==  "British Columbia" ) %>% 
   dplyr::filter(age_group  ==  "20-34" ) %>%
@@ -152,21 +151,29 @@ g1a <- ds1 %>%
   ggplot(aes(
     x      = year
     ,y     = rate
-    ,color = sex
+    ,fill  = sex # maps onto a different aesthetic than `color = ` 
   ))+
-  geom_point( shape = 21, fill = NA, size = 3 )+ # new
-  geom_line( aes(group = sex), alpha = .6 )+                 # new
-  geom_smooth( method = "lm", se = F, size=.2 )+              # new
+  geom_smooth(method = "lm", se = F, size=1, aes(color=sex))+ # to show linear trend
+  geom_line(aes(group = sex), alpha = .5 )+                   # to minimize emphasis
+  geom_point(shape = 21, color="black", size = 3)+            # to minimize ink
+  scale_fill_viridis_d( end=.85, option="plasma",alpha = .6)+ # colorblind-friendly
+  scale_color_viridis_d(end=.85, option="plasma",alpha = .6)+ # colorblind-friendly
   theme_minimal()+
   labs( title = "Crude prevalence of MH service utilization in BC among 20-34 year olds")
-g1a
+g1a 
+  
+
+# AESTHETIC ASIDE: the following values seems to work well in this context
+# scale_color_viridis_d(end=.75)+
+# scale_color_viridis_d(end=.85, option="plasma")+
+# scale_color_viridis_d(end=.70, option="magma")+
+# scale_color_viridis_d(end=.80, option="inferno")+
 
 # ---- phase-1-graph-2 --------------------------
-# let us introduce external dimensions
-# we will keep one of the external dimension constant and facet_wrap on the other
-
+# now we can introduce external dimensions 
+# notice we remove the filter and feed `area` to ggplot2::facet_wrap()
 g2a <- ds1 %>% 
-  # dplyr::filter(area       ==  "British Columbia" ) %>% 
+  # dplyr::filter(area       ==  "British Columbia" ) %>% # to enable faceting
   dplyr::filter(age_group  ==  "20-34" ) %>%
   dplyr::filter(sex       %in% c("Males","Females") ) %>% 
   ggplot(aes(
@@ -174,14 +181,20 @@ g2a <- ds1 %>%
     ,y     = rate
     ,color = sex
   ))+
+  geom_line(aes(group= sex))+
   geom_point()+
-  geom_line( aes(group = sex) )+
-  facet_wrap("area")+ # new
+  facet_wrap("area")+ # we can becasue we removed filter
+  scale_color_viridis_d(end=.70, option="magma")+ 
   theme_minimal()+
   labs( title = "Crude prevalence of MH service utilization in Canada among 20-34 year olds")
-g2a
+g2a  
 
 
+
+# see more about the viridis package: 
+# https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html
+
+# now let us feed `age_group` to ggplot2::facet_wrap()
 g2b <- ds1 %>% 
   dplyr::filter(area       ==  "British Columbia" ) %>%
   # dplyr::filter(age_group  ==  "20-34" ) %>%
@@ -189,17 +202,18 @@ g2b <- ds1 %>%
   ggplot(aes(
     x      = year
     ,y     = rate
-    ,color = sex
+    ,color = sex  
   ))+
-  geom_point()+
-  geom_line( aes(group = sex) )+
-  facet_wrap("age_group")+ # new
+  geom_point()+ 
+  geom_line(aes(group= sex) )+
+  facet_wrap("age_group")+ # to change what we facet on
+  scale_color_viridis_d(end=.70, option="magma")+ 
   theme_minimal()+
   labs( title = "Crude prevalence of MH service utilization in British Columbia")
-g2b
-
+g2b 
+  
 # ---- phase-1-graph-3 --------------------------
-# now let facet_grid on both demension
+# now let facet_grid on two demensions
 g2c <- ds1 %>% 
   dplyr::mutate(
     years_since_2000 = year - 2000 # for shorter axis labels
@@ -208,17 +222,18 @@ g2c <- ds1 %>%
   # dplyr::filter(age_group  ==  "20-34" ) %>%
   dplyr::filter(sex       %in% c("Males","Females") ) %>% 
   ggplot(aes(
-    x      = years_since_2000 # new
+    x      = years_since_2000 
     ,y     = rate
     ,color = sex
   ))+
   geom_point()+
-  geom_line( aes(group = sex) )+
+  geom_line(aes(group=sex))+
   facet_grid(age_group ~ area)+ # new
-  # facet_grid(area ~ age_group)+ # new
+  scale_color_viridis_d(end=.70, option="magma")+ 
   theme_minimal()+
+  theme(legend.position = "bottom")+
   labs( title = "Crude prevalence of MH service utilization in Canada")
-g2c
+g2c 
 
 # ---- phase-1-graph-4 --------------------------
 g2d <- ds1 %>% 
@@ -229,17 +244,17 @@ g2d <- ds1 %>%
   # dplyr::filter(age_group  ==  "20-34" ) %>%
   dplyr::filter(sex       %in% c("Males","Females") ) %>% 
   ggplot(aes(
-    x      = years_since_2000 # new
+    x      = years_since_2000  
     ,y     = rate
-    ,color = sex
+    ,color  = sex
   ))+
+  geom_line(aes(group=sex))+
   geom_point()+
-  geom_line( aes(group = sex) )+
-  # facet_grid(age_group ~ area)+ # new
-  facet_grid(area ~ age_group)+ # new
+  facet_grid(area ~ age_group)+ # change faceting
+  scale_color_viridis_d(end=.70, option="magma")+ 
   theme_minimal()+
   labs( title = "Crude prevalence of MH service utilization in Canada")
-g2d
+g2d 
 
 # ---- phase-2-make_plot --------------------------
 # suppose, we have settled on the graphical form `g2d` (immediately above)
@@ -251,11 +266,12 @@ g2d <- ds1 %>%
   ggplot(aes(
     x      = years_since_2000 # new
     ,y     = rate
-    ,color = sex
+    ,color  = sex
   ))+
   geom_point()+
-  geom_line( aes(group = sex) )+
-  facet_grid(area ~ age_group)+ # new
+  geom_line(aes(group=sex))+
+  facet_grid(area ~ age_group)+
+  scale_color_viridis_d(end=.70, option="magma")+ 
   theme_minimal()+
   labs( title = "Crude prevalence of MH service utilization in Canada")
 
@@ -274,11 +290,12 @@ make_plot_1_basic <- function(
     ggplot(aes_string(
        x      = "years_since_2000"
        ,y     = measure
-       ,color = "sex"
+       ,color  = "sex"
     ))+
     geom_point()+
-    geom_line( aes_string(group = "sex") )+
+    geom_line(aes(group=sex))+
     facet_grid(area ~ age_group)+
+    scale_color_viridis_d(end=.70, option="magma")+ 
     theme_minimal()+
     labs( title = "Crude prevalence of MH service utilization in Canada")
   return(g_out)  
@@ -286,6 +303,8 @@ make_plot_1_basic <- function(
 # how to use:
 ds1 %>% 
   dplyr::filter(sex       %in% c("Males","Females") ) %>% 
+  dplyr::filter(age_group %in% c("1-19", "20-34", "35-49", "65-79")) %>%
+  dplyr::filter(area %in% c("Canada", "Manitoba", "British Columbia")) %>%
   # notice that we keep operations on the data outside of the function definition
   make_plot_1_basic(measure = "rate")
 
@@ -343,20 +362,20 @@ make_plot_1_packed <- function(
       ,y     = "rate"
       ,color = "sex"
     ))+
-    geom_point()+
     geom_line( aes_string(group = "sex") )+
+    geom_point()+
     facet_grid(area ~ age_group)+
     scale_color_manual(values = palette_sex_dark)+
     # scale_color_manual(values = pallete_sex_light)+
     theme_minimal()+
-    labs( title = "Crude prevalence of MH service utilization in BC among 20-34 year olds")
+    labs( title = "Crude prevalence of MH service utilization in Canada")
   return(g_out)  
 }
 # how to use
 ds1 %>% 
   # to limit the view while in development
-  dplyr::filter(age_group %in% c("1-19", "20-34", "80+","1+")) %>%
-  dplyr::filter(area %in% c("Canada", "Alberta", "British Columbia")) %>%
+  dplyr::filter(age_group %in% c("1-19", "20-34", "35-49", "65-79")) %>%
+  dplyr::filter(area %in% c("Canada", "Manitoba", "British Columbia")) %>%
   dplyr::filter(sex %in% c("Males","Females")) %>%
   make_plot_1_packed(measure = "rate")
 
@@ -405,10 +424,10 @@ prep_data_plot_1 <- function(
 l_support <- ds1 %>% 
   prep_data_plot_1(
     set_area      = c("Canada")
-    # set_area      = c("Canada", "Alberta", "British Columbia") 
+    # set_area      = c("Canada", "Manitoba", "British Columbia") 
     # ,set_sex       = c("Females", "Males")
     ,set_sex       = c("Both sexes")
-    # ,set_age_group = c("1-19", "20-34", "80+","1+")
+    # ,set_age_group = c("1-19",  "35-49", "65-79","1+")
     ,set_age_group = c("1+")
   )
 l_support %>% print()
@@ -449,12 +468,12 @@ make_plot_1 <- function(
 # how to use
 l_support <- ds1 %>% 
   prep_data_plot_1(
-    # set_area      = c("Canada")
-    set_area      = c("Canada", "Alberta", "British Columbia")
+    set_area      = c("Canada")
+    # set_area      = c("Canada", "Manitoba", "British Columbia")
     ,set_sex       = c("Females", "Males")
     # ,set_sex       = c("Both sexes")
-    # ,set_age_group = c("1-19", "20-34", "80+","1+")
-    ,set_age_group = c("1+")
+    ,set_age_group = c("1-19", "20-34","35-49","50-64","65-79", "80+")
+    # ,set_age_group = c("1+")
   ) %>% 
   make_plot_1(measure = "rate")
 l_support$graph %>% print()
@@ -511,8 +530,8 @@ l_support <- ds1 %>%
   prep_data_plot_1(
     set_sex        = c("Females", "Males") 
     # set_sex        = c("Females", "Males", "Both sexes") 
-    ,set_area      = c("Canada", "Alberta", "British Columbia") 
-    ,set_age_group = c("1-19", "20-34", "80+","1+")
+    ,set_area      = c("Canada", "Manitoba", "British Columbia") 
+    ,set_age_group = c("1-19",  "35-49", "65-79","1+")
   ) %>% 
   make_plot_1(
     measure = "rate"
@@ -523,7 +542,7 @@ l_support <- ds1 %>%
     # ,graph_name        = "take1" # `auto` by default
 # options added through `...` into the jpeg() function   
     ,width   = 1700
-    ,height  = 500
+    ,height  = 700
     ,units   = "px"
     ,quality = 100
     ,res     = 200
@@ -557,8 +576,8 @@ l_support$path_plot %>% jpeg::readJPEG() %>% grid::grid.raster()
 
 # GRAPH SERIES 1
 path_target           <- "./analysis/scenario-3/prints/series_1/"
-provinces_to_pair     <- c("British Columbia", "Alberta", "Quebec")
-age_groups_to_display <- c("1-19", "20-34", "35-49", "50-64","65-79","80+","+1")
+provinces_to_pair     <- c("British Columbia", "Alberta", "Manitoba")
+age_groups_to_display <- c("1-19", "20-34", "35-49", "50-64","65-79","80+","1+")
 # for each selected province create a comparison with Canada
 ls_plot_series <- list()
 for(province_i in provinces_to_pair){
@@ -575,7 +594,7 @@ for(province_i in provinces_to_pair){
       path_output_folder = path_target
       # options added through `...` into the jpeg() function
       ,width   = 1700
-      ,height  = 500
+      ,height  = 600
       ,units   = "px"
       ,quality = 100
       ,res     = 200
@@ -585,7 +604,7 @@ saveRDS(ls_plot_series, paste0(path_target,"ls_plots.rds") )
 
 # GRAPH SERIES 2
 path_target           <- "./analysis/scenario-3/prints/series_2/"
-provinces_to_pair     <- c("British Columbia", "Alberta", "Quebec")
+provinces_to_pair     <- c("British Columbia", "Alberta", "Manitoba")
 age_groups_to_display <- c( "+1")
 # for each selected province create a comparison with Canada
 ls_plot_series <- list()
@@ -603,7 +622,7 @@ for(province_i in provinces_to_pair){
       path_output_folder = path_target
       # options added through `...` into the jpeg() function
       ,width   = 900
-      ,height  = 500
+      ,height  = 600
       ,units   = "px"
       ,quality = 100
       ,res     = 200

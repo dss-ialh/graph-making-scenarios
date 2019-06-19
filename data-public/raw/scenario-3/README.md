@@ -1,7 +1,7 @@
 `./data-public/raw/scenario-3` Directory
 =========
 
-Data pulled from the Canadian Chronic Disease Surveillance System (CCDSS). View data dictionary at http://infobase.phac-aspc.gc.ca/cubes/ccdss-eng.html. 
+Data pulled from the Canadian Chronic Disease Surveillance System (CCDSS). 
 
 # Mental Health Services
 - URL: https://health-infobase.canada.ca/ccdss/data-tool/

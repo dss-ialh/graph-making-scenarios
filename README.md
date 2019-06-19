@@ -11,7 +11,6 @@ Collection of scenarios to help learn making graphs with ggplot2.
     - [data description][data_scenario_3]
     - [2019-06-05-session promo][2019_06_05_session_overview]
     - [2019-06-05-session handout][2019_06_05_session_handout]
-    - [2019-06-19-session promo][2019_06_19_session_overview]
     - [2019-06-19-session handout][2019_06_19_session_handout]
 
 

@@ -1,0 +1,123 @@
+---
+title: "DSS - Power Tips November 2020"
+author: "Andriy Koval"
+date: "11/29/2020"
+output: html_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE}
+library(magrittr)
+library(dplyr)
+library(ggplot2)
+library(rlang)
+```
+
+
+# 1  
+
+
+```{r}
+mtcars %>% 
+  filter(cyl == 4) %>%
+    ggplot(aes(x = mpg, y = disp ))+
+      geom_point()+
+      geom_point(shape = 0, size = 4,data = mtcars %>% filter(cyl==4, gear == 4))
+
+# Re-write with auto-reference
+mtcars %>% 
+  filter(cyl == 4) %>%
+  {
+    ggplot(.,aes(x = mpg, y = disp ))+
+      geom_point()+
+      geom_point(shape = 0, size = 4,data = . %>% filter(gear == 4))
+  }
+
+
+```
+
+
+
+# References
+
+- [How to make your own ggplo2 functions](https://www.youtube.com/watch?v=9v9-EpTuwk0)
+- [Tidy Eval Meets ggplot2](https://www.onceupondata.com/2018/07/06/ggplot-tidyeval/)
+- [Tidy evaluation, most common actions](https://edwinth.github.io/blog/dplyr-recipes/)
+
+# 1. Placing scales on all facets
+
+When faceting a plot, we may need to place axis labels on each facet (especially if we have many of them):
+```{r}
+mtcars %>% 
+  ggplot(aes(x=disp, y = mpg))+
+  geom_point()+
+  facet_wrap(~cyl, ncol=1)+ 
+  theme_dark()
+```
+
+One way of achieving this is to use `scale = "free_x"` argument, but if data on the faceted levels covers different ranges of values, the limits of the scale will be adjusted:
+```{r}
+mtcars %>% 
+  ggplot(aes(x=disp, y = mpg))+
+  geom_point()+
+  # facet_wrap(~cyl, ncol=1) 
+  facet_wrap(~cyl, ncol=1, scales = "free_x")+ # puts tickmarks, but distorts scale
+  theme_dark()
+```
+
+Comes in the `lemon` package, which provides functions `racet_rep_wrap()` and `facet_rep_grid()` to offer exactly this flexibility. You can also use the arguments you  normally pass to `facet_wrap()` or `facet_grid()` respectively:
+```{r}
+mtcars %>% 
+  ggplot(aes(x=disp, y = mpg))+
+  geom_point()+
+  # facet_wrap(~cyl, ncol=1) 
+  # facet_wrap(~cyl, ncol=1, scales = "free_x") # puts tickmarks, but distorts scale
+  lemon::facet_rep_wrap(~cyl,ncol=1, repeat.tick.labels = TRUE)+
+  theme_dark()
+```
+
+# 2. Tidy Evals with {{
+
+When turning your ggplots into functions, we can use `aes_string` funtion to pass quoted strings as variable names
+
+```{r}
+make_faceted_scatter <- function(d,xvar,yvar){
+  mtcars %>% 
+    ggplot(aes_string(x=xvar, y = yvar))+
+    geom_point()+
+    theme_dark()
+}
+mtcars %>% make_faceted_scatter("disp","mpg")
+```
+
+However, passing an unquoted variable names to function required resorting to `rlang` package to translate bares (unquoted names) to quosures in functions:
+  
+```{r include=FALSE}
+make_faceted_scatter <- function(d,xvar,yvar){
+  xvar_enquo <- rlang::enquo(xvar)
+  yvar_enquo <- rlang::enquo(yvar)
+  mtcars %>% 
+    ggplot(aes(x=!!xvar_enquo, y = !!yvar_enquo))+
+    geom_point()+
+    theme_dark()
+}
+mtcars %>% make_faceted_scatter(disp,mpg)
+```
+
+Unfortunately, this did not play well with facets. However, since  `0.4.0` version, `rlang` provides a shortcut for this implementation using `{{}}`, which pairs up with the new (`ggplot2 3.0.0`) helper function `vars()` in `facet_wrap()` to make it work: 
+  
+```{r}
+library(rlang)
+make_faceted_scatter <- function(d,xvar, yvar,fvar){
+  mtcars %>% 
+    ggplot(aes(x={{xvar}}, y = {{yvar}}))+
+    geom_point()+
+    lemon::facet_rep_wrap(vars({{fvar}}),ncol=1, repeat.tick.labels = TRUE)+
+    theme_dark()
+}
+mtcars %>% make_faceted_scatter(disp,mpg,cyl)
+```
+

@@ -25,13 +25,13 @@ base::source("./scripts/graphing/graph-presets.R") # fonts, colors, themes
 # location of the data sources
 path_input  <- "./data-public/raw/scenario-3/PHAC_Infobase_CCDSS_-8586421808967913043.csv" # mental illness
 # path_input   <- "./data-public/raw/scenario-3/PHAC_Infobase_CCDSS_-8586421810172823624.csv" # anxiety & mood
-output_format = "pandoc"
+output_format = "html"
 # ---- rmd-specific ----------------------------
 
 # ---- load-data -------------------------------
 # see ./data-unshared/contents.md for origin of the data
 ds0 <- path_input %>% readr::read_csv(skip = 3) %>% tibble::as_tibble()
-ds0 %>% dplyr::glimpse()
+ds0 %>% dplyr::glimpse(60)
 
 # ---- tweak-data ------------------------------
 # to trace the tweaks
@@ -48,7 +48,7 @@ ds1 <- ds1 %>%
     age_group = gsub("'","",age_group) # to remove extra set of quotes
   ) %>% 
   dplyr::filter(!is.na(condition)) # to remove notes at the end of the spreadsheet
-ds1 %>% dplyr::glimpse(80)
+ds1 %>% dplyr::glimpse(60)
 
 # ---- inspect-data-1 ----------------------------
 # to demonstrate the principle of custom functions
